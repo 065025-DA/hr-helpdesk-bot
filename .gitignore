@@ -22,3 +22,6 @@ data/parsed/
 __pycache__/
 >>>>>>> feature/rag-core
 cloudflared.deb
+
+.venv-vercel/
+requirements.hr-backup.txt

@@ -42,7 +42,7 @@ from llama_index.core import VectorStoreIndex, Settings
 from llama_index.core.vector_stores import (
     MetadataFilters, MetadataFilter, FilterOperator, FilterCondition,
 )
-from llama_index.core.postprocessor import SentenceTransformerRerank
+from rag.onnx_rerank import OnnxRerank
 from llama_index.core.schema import NodeWithScore
 from llama_index.llms.ollama import Ollama
 from llama_index.vector_stores.qdrant import QdrantVectorStore
@@ -107,12 +107,8 @@ def _get_reranker():
     what actually happened."""
     global _reranker
     if _reranker is None:
-        print("Loading reranker model (first use only, downloads ~80MB "
-              "from Hugging Face if not already cached)...")
-        _reranker = SentenceTransformerRerank(
-            model="cross-encoder/ms-marco-TinyBERT-L-2-v2",
-            top_n=4,
-        )
+        print("Loading ONNX reranker model (first use only)...")
+        _reranker = OnnxRerank(top_n=4)
     return _reranker
 
 def _get_index():

@@ -1,12 +1,16 @@
-fastapi
-uvicorn
-python-dotenv
-llama-index-core
-llama-index-llms-ollama
-llama-index-vector-stores-qdrant
-llama-index-postprocessor-sbert-rerank
-llama-index-embeddings-huggingface-api
-qdrant-client
-sentence-transformers
-langgraph
-langchain-core
+# Runtime dependencies (Vercel function + Docker image). Pinned to the versions the
+# project was built and tested with. No PyTorch / sentence-transformers any more:
+# the reranker runs with onnxruntime (see rag/onnx_rerank.py).
+fastapi==0.141.1
+uvicorn==0.53.0
+python-dotenv==1.2.3
+llama-index-core==0.14.24
+llama-index-llms-ollama==0.11.0
+llama-index-vector-stores-qdrant==0.10.3
+qdrant-client==1.19.1
+huggingface_hub==1.32.0
+langgraph==1.2.11
+langchain-core==1.6.3
+onnxruntime==1.30.0
+tokenizers==0.23.2
+numpy==2.5.3
