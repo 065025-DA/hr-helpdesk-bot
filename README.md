@@ -1,6 +1,6 @@
 <div align="center">
 
-# Enterprise Policy RAG — Edith
+# Enterprise Policy RAG - Edith
 
 **A production-style, multi-department Retrieval-Augmented Generation system.**
 Document ingestion → department-aware retrieval & reranking → LangGraph-driven
