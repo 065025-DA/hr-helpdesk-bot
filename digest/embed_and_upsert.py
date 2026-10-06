@@ -22,7 +22,7 @@ CHUNKS_PATH = PROJECT_ROOT / "data" / "chunks.pkl"
 
 QDRANT_URL = os.getenv("QDRANT_URL")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
-COLLECTION_NAME = "enterprise_policy_docs"
+COLLECTION_NAME = "hr_helpdesk_docs"
 
 EMBEDDING_MODEL = "sentence-transformers/all-MiniLM-L6-v2"
 HUGGINGFACE_API_KEY = os.getenv("HUGGINGFACE_API_KEY")

@@ -38,7 +38,7 @@ EMBEDDING_MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 # --------------------------------------------------------------------
 QDRANT_URL = os.getenv("QDRANT_URL", "http://localhost:6333")
 QDRANT_API_KEY = os.getenv("QDRANT_API_KEY", None)
-QDRANT_COLLECTION_NAME = "enterprise_policy_docs"
+QDRANT_COLLECTION_NAME = "hr_helpdesk_docs"
 
 # --------------------------------------------------------------------
 # Departments - the single list every script should reference

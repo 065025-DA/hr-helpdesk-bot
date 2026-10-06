@@ -8327,3 +8327,574 @@ textarea:focus-visible {
 }
 
 
+
+
+/* =========================================================
+   HR HELPDESK ADDITIONS (rich text, ticket card, sign-in)
+========================================================= */
+
+.assistant-answer .rich-text p {
+  margin: 0 0 12px;
+  color: #171721;
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.assistant-answer .rich-text p:last-child {
+  margin-bottom: 0;
+}
+
+.assistant-answer .rich-text ul {
+  margin: 0 0 12px;
+  padding-left: 22px;
+}
+
+.assistant-answer .rich-text li {
+  margin: 5px 0;
+  color: #171721;
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.assistant-answer .rich-text strong {
+  font-weight: 700;
+}
+
+/* long section names in source buttons */
+.answer-source > div {
+  min-width: 0;
+}
+
+.answer-source > div span {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ---------- ticket card ---------- */
+
+.ticket-card {
+  margin-top: 20px;
+  padding: 16px 18px;
+
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  border: 1px solid #ecd9a8;
+  border-radius: 16px;
+  background: #fffaf0;
+}
+
+.ticket-card.done {
+  border-color: #b9e3da;
+  background: #f1fbf8;
+}
+
+.ticket-card-icon {
+  width: 38px;
+  height: 38px;
+  flex: 0 0 38px;
+
+  border-radius: 11px;
+  background: #fdecc2;
+  color: #a96a00;
+
+  display: grid;
+  place-items: center;
+}
+
+.ticket-card.done .ticket-card-icon {
+  background: #c9efe6;
+  color: #0b7a6c;
+}
+
+.ticket-card-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.ticket-card-body strong,
+.ticket-card-body span {
+  display: block;
+}
+
+.ticket-card-body strong {
+  font-size: 15px;
+  color: #171721;
+}
+
+.ticket-card-body span {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #55535e;
+}
+
+.ticket-card-body .ticket-question {
+  font-style: italic;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-card-body .ticket-error {
+  color: #b3261e;
+  font-weight: 600;
+}
+
+.ticket-button {
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 0 18px;
+
+  border: 0;
+  border-radius: 11px;
+  background: var(--purple);
+  color: white;
+
+  font-size: 14px;
+  font-weight: 700;
+
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.ticket-button:hover:not(:disabled) {
+  background: var(--purple-dark);
+  transform: translateY(-1px);
+}
+
+.ticket-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ---------- sign-in modal ---------- */
+
+.signin-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+
+  padding: 18px;
+
+  display: grid;
+  place-items: center;
+
+  background: rgba(23, 23, 33, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.signin-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 26px;
+
+  border-radius: 22px;
+  background: #fffefa;
+  box-shadow: 0 30px 80px rgba(23, 23, 33, 0.3);
+}
+
+.signin-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.signin-close {
+  width: 36px;
+  height: 36px;
+
+  border: 0;
+  border-radius: 10px;
+  background: #f0eee9;
+  color: #171721;
+
+  display: grid;
+  place-items: center;
+}
+
+.signin-card h3 {
+  margin: 18px 0 8px;
+  font-family: "Playfair Display", serif;
+  font-size: 26px;
+  line-height: 1.2;
+}
+
+.signin-card p {
+  margin: 0 0 18px;
+  color: #55535e;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.signin-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+
+  border: 1.5px solid #dfdcd6;
+  border-radius: 13px;
+  background: white;
+
+  font: inherit;
+  font-size: 16px;
+  color: #171721;
+  text-transform: uppercase;
+}
+
+.signin-input::placeholder {
+  text-transform: none;
+  color: #8d8b95;
+}
+
+.signin-input:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px rgba(118, 84, 246, 0.14);
+}
+
+.signin-error {
+  margin-top: 10px;
+  color: #b3261e;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.signin-submit {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.signin-submit:disabled {
+  opacity: 0.65;
+}
+
+.signin-skip {
+  width: 100%;
+  margin-top: 12px;
+
+  border: 0;
+  background: transparent;
+  color: #55535e;
+
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+/* sidebar sign-in / sign-out button */
+
+.sidebar-user-action {
+  margin-left: auto;
+  width: 34px;
+  height: 34px;
+
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #171721;
+
+  display: grid;
+  place-items: center;
+}
+
+.sidebar-user-action:hover {
+  background: #e6e2db;
+}
+
+.sidebar-user-action svg {
+  margin-left: 0;
+}
+
+@media (max-width: 560px) {
+  .ticket-card {
+    flex-wrap: wrap;
+  }
+
+  .ticket-button {
+    width: 100%;
+  }
+}
+
+
+/* =========================================================
+   CHANGE: PINNED, DARK-PURPLE SIDEBAR WITH LARGER TEXT
+========================================================= */
+
+/* Pin the layout to the screen: only the conversation scrolls. */
+.assistant-page {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.assistant-sidebar {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  background: linear-gradient(180deg, #3a2490 0%, #2b1a73 55%, #20145a 100%);
+  border-right: 0;
+  color: #ffffff;
+}
+
+.assistant-sidebar .sidebar-content {
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.35) transparent;
+}
+
+.assistant-main {
+  height: 100vh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.assistant-main .conversation {
+  min-height: 0;
+}
+
+.assistant-main .assistant-empty {
+  min-height: 0;
+  overflow-y: auto;
+  justify-content: flex-start;
+}
+
+.assistant-main .assistant-empty-content {
+  margin: auto;
+}
+
+/* ---------- brand ---------- */
+
+.assistant-sidebar .sidebar-brand {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.assistant-sidebar .sidebar-brand strong {
+  color: #ffffff;
+  font-size: 22px;
+}
+
+.assistant-sidebar .sidebar-brand span {
+  color: #d6ceff;
+  font-size: 12px;
+  letter-spacing: 1.8px;
+}
+
+.assistant-sidebar .sidebar-close {
+  color: #ffffff;
+}
+
+/* ---------- links and buttons ---------- */
+
+.assistant-sidebar .back-link {
+  color: #e6e0ff;
+  font-size: 16px !important;
+}
+
+.assistant-sidebar .back-link:hover {
+  color: #ffffff;
+}
+
+.assistant-sidebar .new-conversation {
+  height: 56px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  color: #ffffff;
+  font-size: 17px;
+}
+
+.assistant-sidebar .new-conversation:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+}
+
+.assistant-sidebar .shortcut {
+  color: #ffffff;
+  opacity: 0.7;
+  font-size: 13px;
+}
+
+/* ---------- section labels ---------- */
+
+.assistant-sidebar .sidebar-section-label {
+  color: #d6ceff;
+  font-size: 13px !important;
+  letter-spacing: 1.8px;
+}
+
+/* ---------- topic list ---------- */
+
+.assistant-sidebar .sidebar-department {
+  min-height: 52px;
+  color: #ffffff;
+  font-size: 18px !important;
+}
+
+.assistant-sidebar .sidebar-department:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+}
+
+.assistant-sidebar .sidebar-department.active {
+  background: #ffffff;
+  color: var(--side-color, var(--purple));
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.22);
+}
+
+.assistant-sidebar .sidebar-department .department-chevron,
+.assistant-sidebar .sidebar-department .side-arrow {
+  color: currentColor;
+}
+
+/* ---------- suggested questions ---------- */
+
+.assistant-sidebar .sidebar-submenu {
+  border-left: 1px dashed rgba(255, 255, 255, 0.35);
+}
+
+.assistant-sidebar .submenu-status {
+  color: #d6ceff;
+  font-size: 13px;
+}
+
+.assistant-sidebar .sidebar-submenu button {
+  color: #ece8ff;
+  font-size: 15px;
+  line-height: 1.4;
+  padding: 10px 4px;
+}
+
+.assistant-sidebar .sidebar-submenu button:hover {
+  color: #ffffff;
+}
+
+/* ---------- recent conversations ---------- */
+
+.assistant-sidebar .history-section {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.assistant-sidebar .history-item {
+  color: #ece8ff;
+  font-size: 15px !important;
+}
+
+.assistant-sidebar .history-item:hover {
+  background: rgba(255, 255, 255, 0.13);
+  color: #ffffff;
+}
+
+/* ---------- system status ---------- */
+
+.assistant-sidebar .status-card {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+}
+
+.assistant-sidebar .status-card-heading strong {
+  color: #ffffff;
+  font-size: 15px;
+}
+
+.assistant-sidebar .status-card > span {
+  color: #d6ceff;
+  font-size: 13px;
+}
+
+/* ---------- signed-in user ---------- */
+
+.assistant-sidebar .sidebar-user {
+  min-height: 84px;
+  background: rgba(0, 0, 0, 0.22);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.assistant-sidebar .user-avatar {
+  width: 42px;
+  height: 42px;
+  background: #ffffff;
+  color: var(--purple-dark);
+  font-size: 17px;
+}
+
+.assistant-sidebar .sidebar-user strong {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.assistant-sidebar .sidebar-user span {
+  color: #d6ceff;
+  font-size: 13px;
+}
+
+.assistant-sidebar .sidebar-user svg,
+.assistant-sidebar .sidebar-user-action {
+  color: #ffffff;
+}
+
+.assistant-sidebar .sidebar-user-action:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+
+/* =========================================================
+   CHANGE: HR DOCUMENTS CARD
+========================================================= */
+
+.document-list {
+  max-height: 176px;
+  overflow-y: auto;
+  padding-right: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: #d8d3ca transparent;
+}
+
+a.document-link,
+a.document-link:visited {
+  text-decoration: none;
+  color: #171721;
+  cursor: pointer;
+}
+
+
+/* =========================================================
+   CHANGE: EMPLOYEE ID DROP-DOWN IN THE SIGN-IN BOX
+========================================================= */
+
+.signin-select {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 14px;
+
+  border: 1.5px solid #dfdcd6;
+  border-radius: 13px;
+  background: white;
+
+  font: inherit;
+  font-size: 16px;
+  color: #171721;
+  cursor: pointer;
+}
+
+.signin-select:focus {
+  outline: none;
+  border-color: var(--purple);
+  box-shadow: 0 0 0 4px rgba(118, 84, 246, 0.14);
+}
+
+.signin-or {
+  margin: 12px 0;
+  text-align: center;
+  font-size: 13px;
+  color: #8d8b95;
+}

@@ -129,6 +129,9 @@ def post_query(request: QueryRequest):
 # works standalone.
 # --------------------------------------------------------------------
 
+from rag.hr_routes import router as hr_router
+app.include_router(hr_router)
+
 _frontend_dist = Path(__file__).parent.parent / "frontend" / "dist"
 if _frontend_dist.exists():
     app.mount("/", StaticFiles(directory=str(_frontend_dist), html=True), name="frontend")

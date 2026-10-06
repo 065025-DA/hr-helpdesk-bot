@@ -1,0 +1,26 @@
+employee_id,name,department,band,location,reporting_manager,date_of_joining,employment_status,cl_entitled,cl_used,cl_balance,sl_entitled,sl_used,sl_balance,el_carried_forward,el_accrued_2026,el_used,el_balance,comp_off_balance,floating_holidays_entitled,floating_holidays_used,floating_holidays_balance,lop_days_2026,balance_as_of
+NB1001,Aarav Mehta,Engineering,B4,Gurugram,Kavita Rao,2021-03-15,Confirmed,8,3,5,8,2,6,22,13.5,8,27.5,0,2,1,1,0,2026-09-30
+NB1002,Priya Sharma,Engineering,B3,Pune,Kavita Rao,2022-07-04,Confirmed,8,4,4,8,1,7,18,13.5,6,25.5,1,2,2,0,0,2026-09-30
+NB1003,Rohan Verma,Sales,B3,Gurugram,Sanjay Iyer,2020-11-09,Confirmed,8,5,3,8,3,5,30,13.5,10,33.5,0,2,0,2,0,2026-09-30
+NB1004,Ananya Nair,Marketing,B2,Bengaluru,Meera Joshi,2024-01-22,Confirmed,8,2,6,8,0,8,12,13.5,4,21.5,0,2,1,1,0,2026-09-30
+NB1005,Vikram Singh,Operations,B4,Gurugram,Rohit Bansal,2019-05-27,Confirmed,8,6,2,8,4,4,30,13.5,12,31.5,2,2,2,0,0,2026-09-30
+NB1006,Sneha Kulkarni,Human Resources,B5,Gurugram,Neha Kulkarni,2018-09-03,Confirmed,8,3,5,8,2,6,30,13.5,7,36.5,0,2,1,1,0,2026-09-30
+NB1007,Arjun Reddy,Engineering,B2,Bengaluru,Kavita Rao,2025-02-10,Confirmed,8,1,7,8,0,8,9,13.5,3,19.5,0,2,0,2,0,2026-09-30
+NB1008,Divya Menon,Finance,B3,Pune,Anil Kapoor,2023-04-17,Confirmed,8,4,4,8,2,6,15,13.5,5,23.5,0,2,2,0,0,2026-09-30
+NB1009,Karan Malhotra,Sales,B5,Gurugram,Sanjay Iyer,2017-08-21,Confirmed,8,2,6,8,1,7,30,13.5,9,34.5,0,2,1,1,0,2026-09-30
+NB1010,Isha Gupta,Legal,B4,Gurugram,Pooja Desai,2022-12-05,Confirmed,8,5,3,8,5,3,20,13.5,6,27.5,0,2,0,2,0.5,2026-09-30
+NB1011,Rahul Deshmukh,IT,B3,Pune,Amit Joshi,2021-10-18,Confirmed,8,7,1,8,2,6,27,13.5,11,29.5,1,2,2,0,0,2026-09-30
+NB1012,Meera Pillai,Marketing,B4,Bengaluru,Meera Joshi,2020-02-03,Confirmed,8,3,5,8,3,5,30,13.5,14,29.5,0,2,1,1,0,2026-09-30
+NB1013,Siddharth Jain,Operations,B1,Gurugram,Rohit Bansal,2025-06-16,Confirmed,8,2,6,8,1,7,6,13.5,2,17.5,3,2,0,2,0,2026-09-30
+NB1014,Pooja Bhatia,Finance,B6,Gurugram,Anil Kapoor,2016-01-11,Confirmed,8,1,7,8,0,8,30,13.5,5,38.5,0,2,0,2,0,2026-09-30
+NB1015,Nikhil Agarwal,Engineering,B3,Bengaluru,Kavita Rao,2023-09-25,Confirmed,8,6,2,8,2,6,16,13.5,7,22.5,0,2,2,0,1,2026-09-30
+NB1016,Tanvi Choudhary,Human Resources,B3,Pune,Neha Kulkarni,2024-08-12,Confirmed,8,3,5,8,1,7,11,13.5,4,20.5,0,2,1,1,0,2026-09-30
+NB1017,Harsh Vardhan,Sales,B2,Gurugram,Sanjay Iyer,2024-11-04,Confirmed,8,4,4,8,2,6,8,13.5,3,18.5,0,2,0,2,0,2026-09-30
+NB1018,Ritu Saxena,Legal,B5,Gurugram,Pooja Desai,2019-03-18,Confirmed,8,2,6,8,1,7,30,13.5,8,35.5,0,2,1,1,0,2026-09-30
+NB1019,Aditya Rao,IT,B4,Bengaluru,Amit Joshi,2021-06-07,Confirmed,8,5,3,8,3,5,25,13.5,9,29.5,0,2,2,0,0,2026-09-30
+NB1020,Kavita Rao,Engineering,B6,Gurugram,Managing Director,2015-04-06,Confirmed,8,1,7,8,0,8,30,13.5,10,33.5,0,2,0,2,0,2026-09-30
+NB1021,Manav Arora,Engineering,B2,Gurugram,Kavita Rao,2026-03-09,Confirmed,6.5,1,5.5,6.5,0,6.5,0,10.5,0,10.5,0,2,0,2,0,2026-09-30
+NB1022,Simran Kaur,Marketing,B3,Gurugram,Meera Joshi,2026-06-10,Probation,4.5,0,4.5,4.5,1,3.5,0,6,0,6,0,2,0,2,0,2026-09-30
+NB1023,Yash Patel,Operations,B1,Pune,Rohit Bansal,2026-06-20,Probation,4,1,3,4,0,4,0,4.5,0,4.5,0,2,0,2,0,2026-09-30
+NB1024,Neelam Thakur,Finance,B2,Bengaluru,Anil Kapoor,2026-08-24,Probation,2.5,0,2.5,2.5,0,2.5,0,1.5,0,1.5,0,2,0,2,0,2026-09-30
+NB1025,Farhan Ali,IT,B3,Gurugram,Amit Joshi,2026-01-12,Confirmed,8,2,6,8,1,7,0,13.5,2,11.5,0,2,1,1,0,2026-09-30

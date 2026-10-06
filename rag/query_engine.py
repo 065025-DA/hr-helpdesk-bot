@@ -222,8 +222,13 @@ def query(question: str, department_filter=None) -> QueryResult:
 Rules:
 - Answer using only the information in the excerpts below.
 - If the excerpts don't fully answer the question, say so explicitly rather than guessing.
+- If the excerpts do not contain the answer at all, reply with exactly the single word NOT_IN_DOCUMENTS and nothing else (no explanation, no sources).
+- Use ONLY what the excerpts explicitly state. Do not infer, extrapolate or reason beyond them. If the question is about a specific situation the excerpts do not explicitly address (for example twins, an exception or a special case), reply with exactly the single word NOT_IN_DOCUMENTS and nothing else.
+- Copy numbers exactly as written in the excerpts (for example Rs. 5,00,000) and never put spaces inside a number.
 - When relevant, mention which department's policy the answer comes from.
-- Be concise and direct.
+- Be concise and direct. Give the answer first (the number, rule or yes/no), then the condition in one or two short sentences, in simple friendly language.
+- Each excerpt starts with a header like 'HR-02 Leave Policy | Section: 7. Earned Leave (EL)'. End your answer with the source in the form (Source: HR-02 Leave Policy, Section 7). Name only sources you used.
+- Never give legal, tax or medical advice, and never share any individual employee's personal data.
 
 Document excerpts:
 {context_str}

@@ -5,89 +5,91 @@ import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
+  CalendarDays,
   Check,
   ChevronRight,
   CircleHelp,
   Copy,
   CreditCard,
   FileText,
-  Gavel,
   History,
+  LogIn,
+  LogOut,
   Menu,
   MessageSquare,
   Search,
   Send,
-  Settings,
   Shield,
   Sparkles,
-  Users,
-  WalletCards,
+  Ticket,
   X,
   Zap,
 } from "lucide-react";
 import "./App.css";
 
+// Edith is now the HR-only helpdesk, so the four departments became three HR "help topics".
 const departments = [
   {
-    id: "HR",
-    name: "Human Resources",
-    short: "HR",
+    id: "policy",
+    name: "Policy questions",
+    short: "Policy",
     description:
-      "Leave, attendance, onboarding, benefits and workplace policies.",
-    icon: Users,
+      "Leave, attendance, pay, benefits, conduct, performance and exit rules, answered from the HR policy documents with the source shown.",
+    icon: BookOpen,
     color: "#F2A11B",
     soft: "#FFF5E5",
     questions: [
-      "How many paid leave days do I get?",
-      "What is the leave approval process?",
-      "What documents are required during onboarding?",
+      "How many casual leaves do I get in a year?",
+      "How does Earned Leave work?",
+      "What is the notice period?",
     ],
   },
   {
-    id: "Legal",
-    name: "Legal",
-    short: "Legal",
+    id: "leave",
+    name: "My leave balance",
+    short: "Leave",
     description:
-      "Contracts, agreements, compliance requirements and legal procedures.",
-    icon: Gavel,
-    color: "#7654F6",
-    soft: "#F1EDFF",
-    questions: [
-      "What is the contract approval process?",
-      "Who can approve a legal agreement?",
-      "What are the document retention requirements?",
-    ],
-  },
-  {
-    id: "Finance",
-    name: "Finance",
-    short: "Finance",
-    description:
-      "Expenses, reimbursements, procurement and financial controls.",
-    icon: WalletCards,
+      "Sign in with your employee ID to see your own Casual, Sick and Earned Leave, comp-off and floating holidays.",
+    icon: CalendarDays,
     color: "#119B8B",
     soft: "#EAF9F6",
     questions: [
-      "How do I submit an expense claim?",
-      "What expenses require prior approval?",
-      "What is the reimbursement timeline?",
+      "What is my leave balance?",
+      "How many casual leaves do I have left?",
+      "Can I take Earned Leave next week?",
     ],
   },
   {
-    id: "IT",
-    name: "Information Technology",
-    short: "IT",
+    id: "tickets",
+    name: "HR tickets",
+    short: "Tickets",
     description:
-      "Access management, security, devices and technology procedures.",
-    icon: Shield,
+      "If Edith can't answer, raise an HR ticket in one click and get a ticket number and the expected response time.",
+    icon: Ticket,
     color: "#2D6CDF",
     soft: "#EDF4FF",
     questions: [
-      "How do I request system access?",
-      "What is the password policy?",
-      "How do I report a security incident?",
+      "My salary has not been credited",
+      "Does the company give a car loan?",
+      "I need an employment verification letter",
     ],
   },
+];
+
+const hrDocuments = [
+  { code: "HR-01", title: "Employee Handbook", file: "HR-01_Employee_Handbook.pdf" },
+  { code: "HR-02", title: "Leave Policy", file: "HR-02_Leave_Policy.pdf" },
+  { code: "HR-03", title: "Attendance, Working Hours and Hybrid Work", file: "HR-03_Attendance_Working_Hours_and_Hybrid_Work.pdf" },
+  { code: "HR-04", title: "Code of Conduct and Ethics", file: "HR-04_Code_of_Conduct_and_Ethics.pdf" },
+  { code: "HR-05", title: "POSH Policy", file: "HR-05_POSH_Policy.pdf" },
+  { code: "HR-06", title: "Compensation, Payroll and Benefits", file: "HR-06_Compensation_Payroll_and_Benefits.pdf" },
+  { code: "HR-07", title: "Recruitment, Onboarding and Probation", file: "HR-07_Recruitment_Onboarding_and_Probation.pdf" },
+  { code: "HR-08", title: "Performance Management and Promotion", file: "HR-08_Performance_Management_and_Promotion.pdf" },
+  { code: "HR-09", title: "Learning and Development", file: "HR-09_Learning_and_Development.pdf" },
+  { code: "HR-10", title: "Grievance and Disciplinary Procedure", file: "HR-10_Grievance_and_Disciplinary_Procedure.pdf" },
+  { code: "HR-11", title: "Separation and Exit Policy", file: "HR-11_Separation_and_Exit_Policy.pdf" },
+  { code: "HR-12", title: "HR Helpdesk and Ticket Procedure", file: "HR-12_HR_Helpdesk_and_Ticket_Procedure.pdf" },
+  { code: "HR-13", title: "HR Quick FAQ", file: "HR-13_HR_Quick_FAQ.pdf" },
 ];
 
 function EdithMark({ small = false }) {
@@ -120,7 +122,7 @@ function App() {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [selectedDepartment, setSelectedDepartment] =
-    useState("All departments");
+    useState("All topics");
 
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
@@ -130,6 +132,17 @@ function App() {
   const [expandedDept, setExpandedDept] = useState(null);
   const [history, setHistory] = useState([]);
   const [backendStatus, setBackendStatus] = useState("checking");
+  const [employee, setEmployee] = useState(() => {
+    try {
+      return JSON.parse(sessionStorage.getItem("edith-employee"));
+    } catch {
+      return null;
+    }
+  });
+  const [showSignIn, setShowSignIn] = useState(false);
+
+  // The question the user asked before signing in, so it can be answered right after sign-in.
+  const [pendingQuestion, setPendingQuestion] = useState(null);
 
   const composerRef = useRef(null);
 
@@ -158,6 +171,76 @@ function App() {
     }
   }
 
+  // Demo sign-in: the employee ID is checked by the backend (/api/hr/signin).
+  // A real company would use single sign-on instead.
+  async function signIn(rawId) {
+    const id = String(rawId || "").trim().toUpperCase();
+
+    if (!id) return "Please enter your employee ID.";
+
+    try {
+      const response = await fetch("/api/hr/signin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ employee_id: id }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        return data.detail || "Could not sign in. Please check your ID.";
+      }
+
+      const emp = {
+        id: data.employee_id,
+        name: data.name,
+        department: data.department,
+      };
+
+      setEmployee(emp);
+      sessionStorage.setItem("edith-employee", JSON.stringify(emp));
+      setShowSignIn(false);
+
+      // Tell the user clearly that sign-in worked and that they can ask now.
+      const firstName = String(emp.name || "").split(" ")[0] || "there";
+      const pending = pendingQuestion;
+
+      setPendingQuestion(null);
+
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now(),
+          role: "assistant",
+          text: pending
+            ? `Hello ${firstName}! You're now signed in as ${emp.id}. I'll answer your earlier question now.`
+            : `Hello ${firstName}! You're now signed in as ${emp.id}. Please go ahead and ask your question. You can ask for your leave balance, ask about an HR policy, or raise an HR ticket.`,
+          sources: [],
+          grounded: true,
+          ticketOffer: null,
+          intent: "greeting",
+        },
+      ]);
+
+      // Answer the question that was asked before sign-in (no need to type it again).
+      if (pending) {
+        askEdith(pending, { employeeId: emp.id, skipUserMessage: true });
+      }
+
+      return null;
+    } catch {
+      return "Cannot reach the server. Is the backend running?";
+    }
+  }
+
+  function signOut() {
+    setEmployee(null);
+    sessionStorage.removeItem("edith-employee");
+    setPendingQuestion(null);
+    setMessages([]);
+    setCitation(null);
+  }
+
   function goHome() {
     setPage("home");
     setMobileMenu(false);
@@ -170,7 +253,7 @@ function App() {
 
   function openAssistant(
     question = "",
-    department = "All departments"
+    department = "All topics"
   ) {
     setPage("assistant");
     setSelectedDepartment(department);
@@ -217,35 +300,49 @@ function App() {
       });
   }
 
-  async function askEdith(question = input) {
+  async function askEdith(question = input, options = {}) {
     const query = question.trim();
 
     if (!query || loading) return;
 
-    const userMessage = {
-      id: Date.now(),
-      role: "user",
-      text: query,
-    };
+    // options.skipUserMessage: re-asking the question the user already typed (after sign-in)
+    // options.employeeId: use this ID right away (the employee state has not updated yet)
+    const askAs = options.employeeId || employee?.id || null;
 
-    setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    if (!options.skipUserMessage) {
+      const userMessage = {
+        id: Date.now(),
+        role: "user",
+        text: query,
+      };
+
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+    }
+
     setLoading(true);
     setCitation(null);
 
     try {
-      const response = await fetch("/api/query", {
+      // last few turns so follow-up questions work ("and for managers?")
+      const turns = messages
+        .filter((m) => !m.error)
+        .slice(-6)
+        .map((m) => ({
+          role: m.role,
+          text: String(m.text || "").slice(0, 600),
+        }));
+
+      const response = await fetch("/api/hr/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-            body: JSON.stringify({
-      question: query,
-      department_filter:
-        selectedDepartment === "All departments"
-          ? null
-          : [selectedDepartment.toLowerCase()],
-    }),
+        body: JSON.stringify({
+          message: query,
+          employee_id: askAs,
+          history: turns,
+        }),
       });
 
       if (!response.ok) {
@@ -276,27 +373,36 @@ function App() {
         text: answer,
         sources: normalizedSources,
         grounded:
-          data.grounded !== undefined
-            ? data.grounded
-            : normalizedSources.length > 0,
+          data.intent && data.intent !== "policy"
+            ? true
+            : normalizedSources.length > 0 && !data.needs_human,
+        ticketOffer: data.ticket_offer || null,
+        intent: data.intent || "policy",
       };
 
       setMessages((prev) => [...prev, assistantMessage]);
 
-      const historyItem = {
-        id: Date.now(),
-        query,
-        department: selectedDepartment,
-      };
+      if (data.intent === "need_signin") {
+        setPendingQuestion(query);
+        setShowSignIn(true);
+      }
 
-      const newHistory = [historyItem, ...history].slice(0, 8);
+      if (!options.skipUserMessage) {
+        const historyItem = {
+          id: Date.now(),
+          query,
+          department: selectedDepartment,
+        };
 
-      setHistory(newHistory);
+        const newHistory = [historyItem, ...history].slice(0, 8);
 
-      localStorage.setItem(
-        "edith-history",
-        JSON.stringify(newHistory)
-      );
+        setHistory(newHistory);
+
+        localStorage.setItem(
+          "edith-history",
+          JSON.stringify(newHistory)
+        );
+      }
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -318,46 +424,64 @@ function App() {
   function normalizeSources(rawSources) {
     if (!Array.isArray(rawSources)) return [];
 
-    return rawSources.map((source, index) => ({
-      id: index + 1,
+    const seen = new Set();
+    const result = [];
 
-      name:
-        source.filename ||
-        source.file_name ||
-                source.source_file ||
-        source.document ||
-        source.title ||
-        source.source ||
-        `Source ${index + 1}`,
-
-      page:
-        source.page ||
-        source.page_number ||
-        source.metadata?.page ||
-        source.metadata?.page_number ||
-        null,
-
-      text:
+    rawSources.forEach((source) => {
+      const rawText = String(
         source.text ||
-        source.content ||
-        source.chunk ||
-        source.context ||
-        "",
+          source.content ||
+          source.chunk ||
+          source.context ||
+          ""
+      );
 
-      relevance:
-        source.score ||
-        source.similarity ||
-        source.relevance ||
-        null,
+      // Each chunk starts with "HR-02 Leave Policy | Section: 7. Earned Leave (EL)"
+      const header = rawText.match(/^(.+?) \| Section: (.+?)\n/);
 
-      type:
-        source.type ||
-        (String(source.filename || "")
-          .toLowerCase()
-          .includes("xlsx")
-          ? "excel"
-          : "pdf"),
-    }));
+      const name = header
+        ? header[1]
+        : source.filename ||
+          source.file_name ||
+          source.source_file ||
+          source.document ||
+          source.title ||
+          source.source ||
+          `Source ${result.length + 1}`;
+
+      const section = header ? header[2] : null;
+      const key = `${name}|${section}`;
+
+      if (seen.has(key)) return;
+      seen.add(key);
+
+      result.push({
+        id: result.length + 1,
+        name,
+        section,
+        page:
+          source.page ||
+          source.page_number ||
+          source.metadata?.page ||
+          source.metadata?.page_number ||
+          null,
+        text: header ? rawText.slice(header[0].length) : rawText,
+        relevance:
+          source.score ||
+          source.similarity ||
+          source.relevance ||
+          null,
+        type:
+          source.type ||
+          (String(source.filename || source.source_file || "")
+            .toLowerCase()
+            .includes("xlsx")
+            ? "excel"
+            : "pdf"),
+      });
+    });
+
+    return result;
   }
 
   function copyAnswer(text) {
@@ -419,6 +543,14 @@ function App() {
           setCitation={setCitation}
           copied={copied}
           copyAnswer={copyAnswer}
+          employee={employee}
+          showSignIn={showSignIn}
+          setShowSignIn={(open) => {
+            setShowSignIn(open);
+            if (!open) setPendingQuestion(null);
+          }}
+          signIn={signIn}
+          signOut={signOut}
         />
       )}
     </div>
@@ -461,7 +593,7 @@ function LandingPage({
           </button>
 
           <button onClick={() => onScroll("departments")}>
-            Departments
+            What Edith does
           </button>
 
           <button onClick={() => onScroll("sources")}>
@@ -509,7 +641,7 @@ function LandingPage({
           <div className="hero-copy">
             <div className="eyebrow">
               <span className="eyebrow-dot"></span>
-              NORTHBRIDGE KNOWLEDGE ASSISTANT
+              NORTHBRIDGE HR HELPDESK
             </div>
 
             <h1>
@@ -526,9 +658,9 @@ function LandingPage({
             </h1>
 
             <p className="hero-description">
-              Edith helps Northbridge employees quickly find and
-              understand information across HR, Legal, Finance and
-              IT, directly from the company's own knowledge base.
+              Edith is the Northbridge HR helpdesk. Ask about leave,
+              attendance, pay and benefits, check your own leave
+              balance, or raise an HR ticket when you need a person.
             </p>
 
             <div className="hero-actions">
@@ -557,7 +689,7 @@ function LandingPage({
 
               <span>
                 <Check size={17} />
-                Department-aware
+                Leave balance and tickets
               </span>
 
             </div>
@@ -594,7 +726,7 @@ function LandingPage({
 
                 <div className="mock-chat">
                   <div className="mock-label">
-                    NORTHBRIDGE KNOWLEDGE
+                    NORTHBRIDGE HR HELPDESK
                   </div>
 
                   <div className="mock-chat-title">
@@ -603,7 +735,7 @@ function LandingPage({
                   </div>
 
                   <div className="mock-user-question">
-                    How many paid leave days do I get?
+                    How many casual leaves do I get?
                   </div>
 
                   <div className="mock-answer">
@@ -619,7 +751,7 @@ function LandingPage({
 
                     <div className="mock-source">
                       <FileText size={16} />
-                      HR Leave Policy · Page 4
+                      HR-02 Leave Policy · Section 5
                       <ArrowUpRight size={15} />
                     </div>
                   </div>
@@ -745,16 +877,16 @@ function LandingPage({
               </div>
 
               <h2>
-                Ask the right
+                Four ways
                 <br />
-                <span>knowledge base.</span>
+                <span>Edith helps.</span>
               </h2>
             </div>
 
             <p>
-              Edith keeps HR, Legal, Finance and IT knowledge
-              organized so employees can ask questions in the right
-              context.
+              Edith answers policy questions, shows your own leave
+              balance, raises an HR ticket when the documents do not
+              have the answer, and lets you read the full HR documents.
             </p>
           </div>
 
@@ -763,9 +895,11 @@ function LandingPage({
               <DepartmentCard
                 key={department.id}
                 department={department}
-                onAsk={onAsk}
+                                onAsk={onAsk}
               />
             ))}
+
+            <DocumentsCard />
           </div>
         </section>
 
@@ -811,7 +945,7 @@ function LandingPage({
 
               <li>
                 <Check size={18} />
-                Document and page reference
+                Document and section reference
               </li>
 
               <li>
@@ -871,7 +1005,7 @@ function LandingPage({
           </button>
 
           <button onClick={() => onScroll("departments")}>
-            Departments
+            What Edith does
           </button>
 
           <button onClick={() => onScroll("sources")}>
@@ -909,8 +1043,8 @@ function EvidenceVisual() {
         </div>
 
         <div>
-          <strong>HR Leave Policy</strong>
-          <span>Page 4</span>
+          <strong>HR-02 Leave Policy</strong>
+          <span>Section 7</span>
         </div>
 
         <Check size={15} />
@@ -922,8 +1056,8 @@ function EvidenceVisual() {
         </div>
 
         <div>
-          <strong>Employee Handbook</strong>
-          <span>Page 18</span>
+          <strong>HR-01 Employee Handbook</strong>
+          <span>Section 10</span>
         </div>
 
         <ArrowUpRight size={15} />
@@ -962,20 +1096,20 @@ function EvidenceVisual() {
         </div>
 
         <div className="evidence-question">
-          "What is the leave approval process?"
+          "How does Earned Leave work?"
         </div>
 
         <div className="evidence-answer-line">
-          Employees should follow the leave approval process
-          defined in the applicable HR policy.
+          Earned Leave builds up at 1.5 days a month and up to
+          30 days can be carried forward.
         </div>
 
         <div className="evidence-citation-row">
           <span className="citation-pill">[1]</span>
 
           <div>
-            <strong>HR Leave Policy</strong>
-            <span>Relevant passage · Page 4</span>
+            <strong>HR-02 Leave Policy</strong>
+            <span>Relevant passage · Section 7</span>
           </div>
 
           <ArrowUpRight size={16} />
@@ -995,6 +1129,65 @@ function EvidenceVisual() {
 /* =========================================================
    DEPARTMENT CARD
 ========================================================= */
+
+// Fourth card in "Four ways Edith helps": opens the full HR policy documents (PDFs in frontend/public/hr-docs).
+function DocumentsCard() {
+  return (
+    <article
+      className="department-card"
+      style={{ "--dept-color": "#C2487A", "--dept-soft": "#FDEEF4" }}
+    >
+      <div className="department-card-glow"></div>
+
+      <div className="department-top">
+        <div className="department-icon-wrap">
+          <div className="department-icon-ring"></div>
+          <FileText size={25} strokeWidth={1.8} />
+        </div>
+
+        <span className="department-code">Documents</span>
+      </div>
+
+      <div className="department-main">
+        <h3>HR documents</h3>
+
+        <p>
+          Read the full policy documents that Edith answers from. Each one
+          opens as a PDF in a new tab.
+        </p>
+      </div>
+
+      <div className="department-divider"></div>
+
+      <div className="try-heading">
+        <span>READ IN FULL</span>
+        <span>{hrDocuments.length} documents</span>
+      </div>
+
+      <div className="question-list document-list">
+        {hrDocuments.map((doc) => (
+          <a
+            key={doc.code}
+            className="department-question document-link"
+            href={`/hr-docs/${doc.file}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="question-number">
+              {doc.code.replace("HR-", "")}
+            </span>
+
+            <span className="question-text">{doc.title}</span>
+
+            <span className="question-arrow">
+              <ArrowUpRight size={16} />
+            </span>
+          </a>
+        ))}
+      </div>
+    </article>
+  );
+}
 
 function DepartmentCard({ department, onAsk }) {
   const [hovered, setHovered] = useState(false);
@@ -1124,6 +1317,11 @@ function AssistantPage({
   setCitation,
   copied,
   copyAnswer,
+  employee,
+  showSignIn,
+  setShowSignIn,
+  signIn,
+  signOut,
 }) {
   return (
     <div className="assistant-page">
@@ -1148,7 +1346,7 @@ function AssistantPage({
 
             <div>
               <strong>Edith</strong>
-              <span>NORTHBRIDGE AI</span>
+              <span>HR HELPDESK</span>
             </div>
           </div>
 
@@ -1180,25 +1378,25 @@ function AssistantPage({
 
           <div className="sidebar-section">
             <div className="sidebar-section-label">
-              DEPARTMENTS
+              WHAT I CAN HELP WITH
             </div>
 
             <button
               className={`sidebar-department all ${
                 selectedDepartment ===
-                "All departments"
+                "All topics"
                   ? "active"
                   : ""
               }`}
               onClick={() =>
                 setSelectedDepartment(
-                  "All departments"
+                  "All topics"
                 )
               }
             >
               <Zap size={18} />
 
-              <span>All departments</span>
+              <span>All topics</span>
 
               <ChevronRight
                 size={15}
@@ -1349,14 +1547,31 @@ function AssistantPage({
         </div>
 
         <div className="sidebar-user">
-          <div className="user-avatar">N</div>
-
-          <div>
-            <strong>Northbridge employee</strong>
-            <span>Internal access</span>
+          <div className="user-avatar">
+            {employee ? employee.name.charAt(0) : "N"}
           </div>
 
-          <Settings size={17} />
+          <div>
+            <strong>
+              {employee ? employee.name : "Not signed in"}
+            </strong>
+            <span>
+              {employee
+                ? `${employee.id} · ${employee.department}`
+                : "Sign in to see your leave balance"}
+            </span>
+          </div>
+
+          <button
+            className="sidebar-user-action"
+            onClick={() =>
+              employee ? signOut() : setShowSignIn(true)
+            }
+            title={employee ? "Sign out" : "Sign in"}
+            aria-label={employee ? "Sign out" : "Sign in"}
+          >
+            {employee ? <LogOut size={17} /> : <LogIn size={17} />}
+          </button>
         </div>
       </aside>
 
@@ -1373,7 +1588,7 @@ function AssistantPage({
 
           <div>
             <span>
-              NORTHBRIDGE KNOWLEDGE
+              NORTHBRIDGE HR HELPDESK
             </span>
 
             <h1>Ask Edith</h1>
@@ -1414,6 +1629,7 @@ function AssistantPage({
             setCitation={setCitation}
             copyAnswer={copyAnswer}
             copied={copied}
+            employeeId={employee?.id}
           />
         )}
 
@@ -1438,6 +1654,13 @@ function AssistantPage({
           </div>
         )}
       </main>
+
+      {showSignIn && (
+        <SignInModal
+          onSignIn={signIn}
+          onClose={() => setShowSignIn(false)}
+        />
+      )}
 
       {citation && (
         <CitationPanel
@@ -1467,7 +1690,7 @@ function AssistantEmptyState({
 }) {
   const suggestions =
     selectedDepartment ===
-    "All departments"
+    "All topics"
       ? departments.map(
           (department) => ({
             department,
@@ -1497,7 +1720,7 @@ function AssistantEmptyState({
     <div className="assistant-empty">
       <div className="assistant-empty-content">
         <div className="assistant-empty-eyebrow">
-          NORTHBRIDGE KNOWLEDGE ASSISTANT
+          NORTHBRIDGE HR HELPDESK
         </div>
 
         <h2>
@@ -1507,9 +1730,9 @@ function AssistantEmptyState({
         </h2>
 
         <p>
-          Ask about HR, Legal, Finance or IT policies.
-          Edith searches the relevant knowledge base
-          and cites the source.
+          Ask about HR policies, check your leave balance, or
+          raise an HR ticket. Edith answers from the HR
+          documents and cites the source.
         </p>
 
         <div className="assistant-suggestions">
@@ -1623,7 +1846,7 @@ function Composer({
 
         <span>
           {selectedDepartment !==
-            "All departments" && (
+            "All topics" && (
             <strong>
               {activeDepartment.name} ·{" "}
             </strong>
@@ -1646,6 +1869,7 @@ function ChatConversation({
   setCitation,
   copyAnswer,
   copied,
+  employeeId,
 }) {
   return (
     <div className="conversation">
@@ -1674,10 +1898,11 @@ function ChatConversation({
                     </div>
                   )}
 
-                  <p>{message.text}</p>
+                  <RichText text={message.text} />
 
                   {!message.grounded &&
-                    !message.error && (
+                    !message.error &&
+                    !message.ticketOffer && (
                       <div className="uncertain-state">
                         <CircleHelp size={18} />
 
@@ -1688,16 +1913,15 @@ function ChatConversation({
                           </strong>
 
                           <span>
-                            Try asking the question
-                            differently or selecting
-                            a specific department.
+                            Try asking the question differently, or raise an HR ticket below.
                           </span>
                         </div>
                       </div>
                     )}
 
                   {message.sources?.length >
-                    0 && (
+                    0 &&
+                    !message.ticketOffer && (
                     <div className="answer-sources">
                       <div className="answer-sources-heading">
                         <span>
@@ -1748,7 +1972,9 @@ function ChatConversation({
                                 </strong>
 
                                 <span>
-                                  {source.page
+                                  {source.section
+                                    ? source.section
+                                    : source.page
                                     ? `Page ${source.page}`
                                     : "Relevant passage"}
                                 </span>
@@ -1763,6 +1989,13 @@ function ChatConversation({
                           )
                         )}
                     </div>
+                  )}
+
+                  {message.ticketOffer && (
+                    <TicketCard
+                      offer={message.ticketOffer}
+                      employeeId={employeeId}
+                    />
                   )}
 
                   <div className="answer-actions">
@@ -1829,6 +2062,240 @@ function ChatConversation({
 }
 
 /* =========================================================
+   HR HELPDESK: RICH TEXT, TICKET CARD, SIGN-IN
+========================================================= */
+
+function renderInline(text) {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+    part.length > 4 && part.startsWith("**") && part.endsWith("**") ? (
+      <strong key={i}>{part.slice(2, -2)}</strong>
+    ) : (
+      part
+    )
+  );
+}
+
+// Shows "- bullet" lines as a list and **bold** as bold, without using dangerouslySetInnerHTML.
+function RichText({ text }) {
+  const blocks = [];
+  let list = [];
+
+  const flush = () => {
+    if (list.length) {
+      blocks.push({ type: "ul", items: list });
+      list = [];
+    }
+  };
+
+  String(text || "")
+    .split("\n")
+    .forEach((line) => {
+      const bullet = line.match(/^\s*[-*]\s+(.*)$/);
+
+      if (bullet) {
+        list.push(bullet[1]);
+      } else {
+        flush();
+        if (line.trim()) blocks.push({ type: "p", text: line });
+      }
+    });
+
+  flush();
+
+  return (
+    <div className="rich-text">
+      {blocks.map((block, i) =>
+        block.type === "ul" ? (
+          <ul key={i}>
+            {block.items.map((item, j) => (
+              <li key={j}>{renderInline(item)}</li>
+            ))}
+          </ul>
+        ) : (
+          <p key={i}>{renderInline(block.text)}</p>
+        )
+      )}
+    </div>
+  );
+}
+
+function TicketCard({ offer, employeeId }) {
+  const [state, setState] = useState("idle");
+  const [ticket, setTicket] = useState(null);
+  const [error, setError] = useState("");
+
+  async function raiseTicket() {
+    setState("loading");
+    setError("");
+
+    try {
+      const response = await fetch("/api/hr/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: offer.question,
+          employee_id: employeeId || null,
+          category: offer.category,
+          priority: offer.priority,
+        }),
+      });
+
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Could not create the ticket.");
+      }
+
+      setTicket(data);
+      setState("done");
+    } catch (e) {
+      setError(e.message || "Could not create the ticket.");
+      setState("idle");
+    }
+  }
+
+  if (state === "done" && ticket) {
+    return (
+      <div className="ticket-card done">
+        <div className="ticket-card-icon">
+          <Check size={18} />
+        </div>
+
+        <div className="ticket-card-body">
+          <strong>Ticket {ticket.ticket_id} raised</strong>
+          <span>
+            {ticket.category} · Priority {ticket.priority} · Status{" "}
+            {ticket.status}
+          </span>
+          <span>
+            HR will respond within {ticket.first_response_within}. Quote
+            this number to hrhelpdesk@northbridge.example for updates.
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ticket-card">
+      <div className="ticket-card-icon">
+        <Ticket size={18} />
+      </div>
+
+      <div className="ticket-card-body">
+        <strong>Raise an HR ticket?</strong>
+        <span>
+          {offer.category} · Priority {offer.priority}
+        </span>
+        <span className="ticket-question">
+          "{String(offer.question || "").slice(0, 140)}"
+        </span>
+        {error && <span className="ticket-error">{error}</span>}
+      </div>
+
+      <button
+        className="ticket-button"
+        onClick={raiseTicket}
+        disabled={state === "loading"}
+      >
+        {state === "loading" ? "Raising..." : "Raise ticket"}
+      </button>
+    </div>
+  );
+}
+
+function SignInModal({ onSignIn, onClose }) {
+  const [id, setId] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const [employees, setEmployees] = useState([]);
+
+  // Employee IDs for the drop-down (demo only: a real company would never list its staff).
+  useEffect(() => {
+    fetch("/api/hr/employees")
+      .then((response) => (response.ok ? response.json() : []))
+      .then((data) => {
+        if (Array.isArray(data)) setEmployees(data);
+      })
+      .catch(() => {});
+  }, []);
+
+  async function submit() {
+    setBusy(true);
+    setError("");
+    const message = await onSignIn(id);
+    setBusy(false);
+    if (message) setError(message);
+  }
+
+  return (
+    <div className="signin-overlay" onClick={onClose}>
+      <div className="signin-card" onClick={(e) => e.stopPropagation()}>
+        <div className="signin-top">
+          <EdithMark />
+
+          <button className="signin-close" onClick={onClose} aria-label="Close">
+            <X size={19} />
+          </button>
+        </div>
+
+        <h3>Sign in to the HR Helpdesk</h3>
+
+        <p>
+          Choose your employee ID from the list (or type it) to see your own
+          leave balance and tickets.
+        </p>
+
+        {employees.length > 0 && (
+          <>
+            <select
+              className="signin-select"
+              value={id}
+              onChange={(e) => setId(e.target.value)}
+              aria-label="Choose your employee ID"
+            >
+              <option value="">Choose your employee ID</option>
+
+              {employees.map((emp) => (
+                <option key={emp.employee_id} value={emp.employee_id}>
+                  {emp.employee_id} · {emp.name} ({emp.department})
+                </option>
+              ))}
+            </select>
+
+            <div className="signin-or">or type it below</div>
+          </>
+        )}
+
+        <input
+          className="signin-input"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") submit();
+          }}
+          placeholder="Employee ID, e.g. NB1001"
+        />
+
+        {error && <div className="signin-error">{error}</div>}
+
+        <button
+          className="primary-cta signin-submit"
+          onClick={submit}
+          disabled={busy}
+        >
+          {busy ? "Checking..." : "Sign in"}
+        </button>
+
+        <button className="signin-skip" onClick={onClose}>
+          Continue without signing in
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* =========================================================
    CITATION PANEL
 ========================================================= */
 
@@ -1867,6 +2334,13 @@ function CitationPanel({
             {citation.type?.toUpperCase() ||
               "DOCUMENT"}
           </span>
+
+          {citation.section && (
+            <span>
+              <BookOpen size={15} />
+              {citation.section}
+            </span>
+          )}
 
           {citation.page && (
             <span>
