@@ -41,13 +41,6 @@ routing and cross-department synthesis → rigorous evaluation → full-stack de
 <tr>
 <td width="50%">
 
-**Cross-department synthesis**
-<br>
-<img src="./docs/screenshots/cross-department.png" alt="A query answered using two departments' documents" width="100%">
-
-</td>
-<td width="50%">
-
 **Evaluation results**
 <br>
 <img src="./docs/screenshots/evaluation.png" alt="Terminal output of the evaluation harness" width="100%">
