@@ -54,40 +54,63 @@ from qdrant_client import QdrantClient
 # --------------------------------------------------------------------
 
 from llama_index.core.embeddings import BaseEmbedding
-from huggingface_hub import InferenceClient
+from pydantic import PrivateAttr
 from typing import Any
+import threading
+import numpy as np
+import onnxruntime as ort
+from tokenizers import Tokenizer
+from pathlib import Path
 
 
-class SyncHuggingFaceEmbedding(BaseEmbedding):
-    """Simple synchronous embedding wrapper, avoiding the async-only
-    HuggingFaceInferenceAPIEmbedding client which conflicts with
-    FastAPI's own event loop under load."""
+class LocalONNXEmbedding(BaseEmbedding):
+    """Local all-MiniLM-L6-v2 embedding using ONNX Runtime."""
 
-    _client: Any = None
-    _model_name: str = EMBEDDING_MODEL_NAME
+    _tokenizer: Any = PrivateAttr(default=None)
+    _session: Any = PrivateAttr(default=None)
+    _lock: Any = PrivateAttr(default_factory=threading.Lock)
 
-    def __init__(self, model_name, token, **kwargs):
+    def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self._client = InferenceClient(token=token)
-        self._model_name = model_name
+        self._load_model()
+
+    def _load_model(self):
+        if self._session is not None:
+            return
+        with self._lock:
+            if self._session is None:
+                model_dir = Path(__file__).parent / "models" / "all-MiniLM-L6-v2"
+                self._tokenizer = Tokenizer.from_file(str(model_dir / "tokenizer.json"))
+                self._tokenizer.enable_truncation(max_length=256)
+                self._session = ort.InferenceSession(
+                    str(model_dir / "model.onnx"),
+                    providers=["CPUExecutionProvider"],
+                )
+
+    def _embed(self, text: str):
+        self._load_model()
+        encoded = self._tokenizer.encode(text)
+        feed = {
+            "input_ids": np.array([encoded.ids], dtype=np.int64),
+            "attention_mask": np.array([encoded.attention_mask], dtype=np.int64),
+        }
+        embedding = self._session.run(None, feed)[1][0]
+        return embedding.tolist()
 
     def _get_query_embedding(self, query: str):
-        return list(self._client.feature_extraction(query, model=self._model_name))
+        return self._embed(query)
 
     def _get_text_embedding(self, text: str):
-        return list(self._client.feature_extraction(text, model=self._model_name))
+        return self._embed(text)
 
     async def _aget_query_embedding(self, query: str):
-        return self._get_query_embedding(query)
+        return self._embed(query)
 
     async def _aget_text_embedding(self, text: str):
-        return self._get_text_embedding(text)
+        return self._embed(text)
 
 
-Settings.embed_model = SyncHuggingFaceEmbedding(
-    model_name=EMBEDDING_MODEL_NAME,
-    token=HUGGINGFACE_API_KEY,
-)
+Settings.embed_model = LocalONNXEmbedding()
 
 Settings.llm = Ollama(
     model=LLM_MODEL_NAME,
